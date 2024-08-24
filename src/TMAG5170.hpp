@@ -26,10 +26,6 @@
 #define ANGLE_RESULT 0x13
 #define MAGNITUDE_RESULT 0x14
 
-// ------------------- SPI command -------------------
-// SPI command to go into the last byte of the SPI frame
-#define START_CONVERSION 0x10
-
 // ------------------- STAT bits -------------------
 
 // Settings in the registers are expressed as 16bit values
@@ -264,6 +260,24 @@
 #define OFFSET_SELECTION_Use2 0x8000
 #define OFFSET_SELECTION_Both 0xC000
 
+// ------------------- ERROR_STAT -------------------
+#define PREV_CRC_STAT_MASK 0x0800
+#define CFG_RESET_MASK 0x0400
+#define ALRT_AFE_MASK 0x0200
+#define ALRT_SYS_MASK 0x0100
+#define X_CURRENT_MASK 0x0080
+#define Y_CURRENT_MASK 0x0040
+#define Z_CURRENT_MASK 0x0020
+#define T_CURRENT_MASK 0x0010
+#define ERROR_STAT_MASK 0x0008
+#define COUNT_MASK 0x0007
+#define DATA_TYPE_MASK 0x0007
+
+// ------------------- SPI command -------------------
+// SPI command to go into the last byte of the SPI frame
+#define START_CONVERSION 0x10
+
+
 #include <stdio.h>
 #include "hardware/gpio.h"
 #include "hardware/irq.h"
@@ -276,12 +290,23 @@ enum TMAG5170_version {
 
 class TMAG5170 {
     private:
+        typedef union {
+            uint8_t byte_arr[4];
+            uint32_t data32;
+        } TMAG5170_SPI_frame;
+
         TMAG5170_version version;
+        spi_inst_t *spi;
         uint spi_cs_pin;
+        uint16_t ERROR_STAT;
 
     public:
         TMAG5170(TMAG5170_version version);
         void attachSPI(spi_inst_t *spi, uint spi_sck_pin, uint spi_mosi_pin, uint spi_miso_pin, uint spi_cs_pin, uint buadrate);
+        uint32_t generateCRC(uint32_t data);
+        int checkCRC(uint32_t received_frame);
+        uint32_t exchangeFrame(uint32_t frame);
+        uint16_t readRegister(uint32_t offset);
 
 };
 
