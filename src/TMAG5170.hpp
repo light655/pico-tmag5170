@@ -302,12 +302,12 @@ class TMAG5170 {
 
     public:
         TMAG5170(TMAG5170_version version);
-        void attachSPI(spi_inst_t *spi, uint spi_sck_pin, uint spi_mosi_pin, uint spi_miso_pin, uint spi_cs_pin, uint buadrate);
+        void attachSPI(spi_inst_t *spi, uint spi_sck_pin, uint spi_mosi_pin, uint spi_miso_pin, uint spi_cs_pin, uint buadrate = 100000);
         uint32_t generateCRC(uint32_t data);
         int checkCRC(uint32_t received_frame);
         uint32_t exchangeFrame(uint32_t frame);
-        uint16_t readRegister(uint8_t offset, bool start_conversion_spi);
-        void writeRegister(uint8_t offset, uint16_t register_content, bool start_conversion_spi);
+        uint16_t readRegister(uint8_t offset, bool start_conversion_spi = false);
+        void writeRegister(uint8_t offset, uint16_t register_content, bool start_conversion_spi = false);
 };
 
 #endif

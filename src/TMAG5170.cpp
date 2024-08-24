@@ -7,7 +7,7 @@ TMAG5170::TMAG5170(TMAG5170_version version) {
 }
 
 // Attach and initialise SPI on Pico for TMAG5170, default buadrate is 100kHz
-void TMAG5170::attachSPI(spi_inst_t *spi, uint spi_sck_pin, uint spi_mosi_pin, uint spi_miso_pin, uint spi_cs_pin, uint buadrate = 1000000) {
+void TMAG5170::attachSPI(spi_inst_t *spi, uint spi_sck_pin, uint spi_mosi_pin, uint spi_miso_pin, uint spi_cs_pin, uint buadrate) {
     this->spi = spi;                    // set spi instance class variable
     spi_init(spi, buadrate);
     spi_set_format(spi, 8, SPI_CPOL_0, SPI_CPHA_0, SPI_MSB_FIRST);
@@ -43,10 +43,10 @@ uint32_t TMAG5170::generateCRC(uint32_t data) {
 
 // Checks the CRC of the received frame. 
 // Returns nonzero value if CRC is incorrect.
-int TMAG5170::checkCRC(uint32_t recieved_frame) {
-    uint32_t received_CRC_calculated = generateCRC(recieved_frame & 0xfffffff0);
+int TMAG5170::checkCRC(uint32_t received_frame) {
+    uint32_t received_CRC_calculated = generateCRC(received_frame & 0xfffffff0);
         // clear the CRC bits and calculate the CRC
-    if(received_CRC_calculated != recieved_frame & 0xf) {
+    if(received_CRC_calculated != (received_frame & 0xf)) {
         // calculated CRC does not match the actual received bits
         return 1;
     } else {
@@ -73,9 +73,9 @@ uint32_t TMAG5170::exchangeFrame(uint32_t frame) {
     return __bswap32(receive_frame.data32);
 }
 
-// Reads the content of the register at the offset in the argument. This function reads the register until the CRC is correct.
+// Reads the content of the register at the offset in the argument. This function attempts to read the register until the CRC is correct.
 // Set start_conversion_spi to initiate conversion when the CS line goes high.
-uint16_t TMAG5170::readRegister(uint8_t offset, bool start_conversion_spi = false) {
+uint16_t TMAG5170::readRegister(uint8_t offset, bool start_conversion_spi) {
     uint32_t sent_frame = ((uint32_t)offset | READ_REG) << 24;
     if(start_conversion_spi) sent_frame |= START_CONVERSION;
     sent_frame |= generateCRC(sent_frame);
@@ -90,7 +90,7 @@ uint16_t TMAG5170::readRegister(uint8_t offset, bool start_conversion_spi = fals
     return (uint16_t)received_frame;
 }
 
-// Writes the register content into the register at the offset provided in the argument.
+// Writes the register content into the register at the offset provided in the argument. This function attempts to write the register until the returning CRC is correct.
 // Set start_conversion_spi to initiate conversion when the CS line goes high.
 void TMAG5170::writeRegister(uint8_t offset, uint16_t register_content, bool start_conversion_spi) {
     uint32_t sent_frame = ((uint32_t)offset << 24) | ((uint32_t)register_content << 8);
