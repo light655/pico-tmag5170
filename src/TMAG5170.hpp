@@ -306,8 +306,8 @@ class TMAG5170 {
         uint32_t generateCRC(uint32_t data);
         int checkCRC(uint32_t received_frame);
         uint32_t exchangeFrame(uint32_t frame);
-        uint16_t readRegister(uint32_t offset);
-
+        uint16_t readRegister(uint8_t offset, bool start_conversion_spi);
+        void writeRegister(uint8_t offset, uint16_t register_content, bool start_conversion_spi);
 };
 
 #endif

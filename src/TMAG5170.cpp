@@ -74,8 +74,10 @@ uint32_t TMAG5170::exchangeFrame(uint32_t frame) {
 }
 
 // Reads the content of the register at the offset in the argument. This function reads the register until the CRC is correct.
-uint16_t TMAG5170::readRegister(uint32_t offset) {
-    uint32_t sent_frame = (offset | READ_REG) << 24;
+// Set start_conversion_spi to initiate conversion when the CS line goes high.
+uint16_t TMAG5170::readRegister(uint8_t offset, bool start_conversion_spi = false) {
+    uint32_t sent_frame = ((uint32_t)offset | READ_REG) << 24;
+    if(start_conversion_spi) sent_frame |= START_CONVERSION;
     sent_frame |= generateCRC(sent_frame);
 
     uint32_t received_frame;
@@ -86,4 +88,19 @@ uint16_t TMAG5170::readRegister(uint32_t offset) {
     received_frame >>= 8;               // extract the middle two bytes for the register content
     received_frame &= 0xffff;
     return (uint16_t)received_frame;
+}
+
+// Writes the register content into the register at the offset provided in the argument.
+// Set start_conversion_spi to initiate conversion when the CS line goes high.
+void TMAG5170::writeRegister(uint8_t offset, uint16_t register_content, bool start_conversion_spi) {
+    uint32_t sent_frame = ((uint32_t)offset << 24) | ((uint32_t)register_content << 8);
+    if(start_conversion_spi) sent_frame |= START_CONVERSION;
+    sent_frame |= generateCRC(sent_frame);
+
+    uint32_t received_frame;
+    do {
+        received_frame = exchangeFrame(sent_frame);
+    } while(checkCRC(received_frame) != 0);
+
+    return;
 }
