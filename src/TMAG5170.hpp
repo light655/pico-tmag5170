@@ -26,8 +26,6 @@
 #define ANGLE_RESULT 0x13
 #define MAGNITUDE_RESULT 0x14
 
-// ------------------- STAT bits -------------------
-
 // Settings in the registers are expressed as 16bit values
 //------------------DEVICE_CONFIG------------------------
 #define CONV_AVG_MASK 0x7000
@@ -262,7 +260,7 @@
 
 // ------------------- ERROR_STAT -------------------
 #define PREV_CRC_STAT_MASK 0x0800
-#define CFG_RESET_MASK 0x0400
+#define ERROR_STAT_CFG_RESET_MASK 0x0400
 #define ALRT_AFE_MASK 0x0200
 #define ALRT_SYS_MASK 0x0100
 #define X_CURRENT_MASK 0x0080
@@ -271,7 +269,7 @@
 #define T_CURRENT_MASK 0x0010
 #define ERROR_STAT_MASK 0x0008
 #define COUNT_MASK 0x0007
-#define DATA_TYPE_MASK 0x0007
+#define ERROR_STAT_DATA_TYPE_MASK 0x0007
 
 // ------------------- SPI command -------------------
 // SPI command to go into the last byte of the SPI frame
@@ -285,7 +283,7 @@
 #include "pico/stdlib.h"
 
 enum TMAG5170_version {
-    A1, A2
+    A1 = 0x0, A2 = 0x1, ERROR =0x3
 };
 
 class TMAG5170 {
@@ -300,14 +298,28 @@ class TMAG5170 {
         uint spi_cs_pin;
         uint16_t ERROR_STAT;
 
+        uint16_t TMAG5170_registers[21] {
+            0x0000, 0x0000, 0x0000, 0x0000,
+            0x7D83, 0x7D83, 0x7D83, 0x6732,
+            0x0000, 0x0000, 0x0000, 0x0000,
+            0x0000, 0x8000, 0x0000, 0x8000,
+            0x0000, 0x0000, 0x0000, 0x0000,
+            0x0000
+        };
+
     public:
-        TMAG5170(TMAG5170_version version);
+        TMAG5170(void);
         void attachSPI(spi_inst_t *spi, uint spi_sck_pin, uint spi_mosi_pin, uint spi_miso_pin, uint spi_cs_pin, uint buadrate = 100000);
+
         uint32_t generateCRC(uint32_t data);
         int checkCRC(uint32_t received_frame);
         uint32_t exchangeFrame(uint32_t frame);
         uint16_t readRegister(uint8_t offset, bool start_conversion_spi = false);
-        void writeRegister(uint8_t offset, uint16_t register_content, bool start_conversion_spi = false);
+        void writeRegister(uint8_t offset, bool start_conversion_spi = false);
+
+        TMAG5170_version init(void);
+        void setOperatingMode(uint32_t operating_mode);
+        void setConversionAverage(uint32_t conversion_average);
 };
 
 #endif

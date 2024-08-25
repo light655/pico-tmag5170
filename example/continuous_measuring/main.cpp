@@ -10,7 +10,7 @@
 void initTMAG(void);
 void alertCallback(uint, uint32_t);
 
-TMAG5170 myTMAG(A2);
+TMAG5170 myTMAG;
 
 int main(void) {
     stdio_init_all();

@@ -1,7 +1,7 @@
 #include "TMAG5170.hpp"
 
-TMAG5170::TMAG5170(TMAG5170_version version) {
-    this->version = version;
+// Contructor, provide the version of the device as the argument
+TMAG5170::TMAG5170(void) {
 
     return;
 }
@@ -87,12 +87,15 @@ uint16_t TMAG5170::readRegister(uint8_t offset, bool start_conversion_spi) {
 
     received_frame >>= 8;               // extract the middle two bytes for the register content
     received_frame &= 0xffff;
-    return (uint16_t)received_frame;
+    uint16_t register_content = (uint16_t)received_frame;
+    TMAG5170_registers[offset] = register_content;
+    return register_content;
 }
 
-// Writes the register content into the register at the offset provided in the argument. This function attempts to write the register until the returning CRC is correct.
+// Writes the register content stored in the array into the register at the offset provided in the argument. This function attempts to write the register until the returning CRC is correct.
 // Set start_conversion_spi to initiate conversion when the CS line goes high.
-void TMAG5170::writeRegister(uint8_t offset, uint16_t register_content, bool start_conversion_spi) {
+void TMAG5170::writeRegister(uint8_t offset, bool start_conversion_spi) {
+    uint16_t register_content = TMAG5170_registers[offset];
     uint32_t sent_frame = ((uint32_t)offset << 24) | ((uint32_t)register_content << 8);
     if(start_conversion_spi) sent_frame |= START_CONVERSION;
     sent_frame |= generateCRC(sent_frame);
@@ -102,5 +105,44 @@ void TMAG5170::writeRegister(uint8_t offset, uint16_t register_content, bool sta
         received_frame = exchangeFrame(sent_frame);
     } while(checkCRC(received_frame) != 0);
 
+    return;
+}
+
+// Initialises TMAG5170, clears the CFG_REST bit and reads the version of the device.
+// Returns the version of the device.
+TMAG5170_version TMAG5170::init(void) {
+    uint16_t AFE16;                     // reads the AFE_STATUS register twice, the MSB should be 0 by the second time.
+    AFE16 = readRegister(AFE_STATUS);
+    AFE16 = readRegister(AFE_STATUS);
+    if(AFE16 & 0x8000) {
+        version = ERROR;
+        return ERROR;
+    }
+
+    uint16_t TEST16;
+    TEST16 = readRegister(TEST_CONFIG);
+    if(((TEST16 & 0x0030) >> 4) == 0x0) {
+        version = A1;
+    } else if(((TEST16 & 0x0030) >> 4) == 0x1) {
+        version = A2;
+    } else {
+        version = ERROR;
+    }
+    return version;
+}
+
+// Sets the operating mode of the device. Use the macros to indicate operating mode.
+void TMAG5170::setOperatingMode(uint32_t operating_mode) {
+    TMAG5170_registers[DEVICE_CONFIG] &= ~OPERATING_MODE_MASK;
+    TMAG5170_registers[DEVICE_CONFIG] |= operating_mode;
+    writeRegister(DEVICE_CONFIG);
+    return;
+}
+
+// Sets the number of averages per conversion of the device. Use the macros to indicate conversion average.
+void TMAG5170::setConversionAverage(uint32_t conversion_average) {
+    TMAG5170_registers[DEVICE_CONFIG] &= ~CONV_AVG_MASK;
+    TMAG5170_registers[DEVICE_CONFIG] |= conversion_average;
+    writeRegister(DEVICE_CONFIG);
     return;
 }
