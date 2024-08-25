@@ -17,15 +17,14 @@ int main(void) {
     sleep_ms(5000);
     printf("Hello world!\n");
 
-    myTMAG.attachSPI(spi0, 18, 19, 20, 21);
+    myTMAG.attachSPI(spi0, 18, 19, 20, 21, 1e6);
+    myTMAG.init();
+    myTMAG.setConversionAverage(CONV_AVG_1x);
+    myTMAG.setOperatingMode(OPERATING_MODE_ActiveMeasureMode);
+    myTMAG.enableMagneticChannel(true, true, true);
+    myTMAG.setMagneticRange(X_RANGE_300mT, Y_RANGE_300mT, Z_RANGE_300mT);
+    myTMAG.enableAlertOutput(true);
 
-    uint16_t tmp16;
-    tmp16 = myTMAG.readRegister(AFE_STATUS);
-    printf("Offset: %.2X; Content: %.4X\n", AFE_STATUS, tmp16);
-    tmp16 = myTMAG.readRegister(AFE_STATUS);
-    printf("Offset: %.2X; Content: %.4X\n", AFE_STATUS, tmp16);
-
-    initTMAG();
     gpio_set_irq_enabled_with_callback(TMAG_ALERT, GPIO_IRQ_EDGE_FALL, true, &alertCallback);
 
     while(true) {
@@ -69,7 +68,7 @@ void initTMAG(void) {
 void alertCallback(uint gpio, uint32_t events) {
     uint64_t t1 = to_us_since_boot(get_absolute_time());
     uint16_t X_result = myTMAG.readRegister(X_CH_RESULT);
-    printf("%lu: %.4X\n", (unsigned long)t1, X_result);
+    // printf("%lu: %.4X\n", (unsigned long)t1, X_result);
 
     return;
 }

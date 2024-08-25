@@ -132,17 +132,83 @@ TMAG5170_version TMAG5170::init(void) {
 }
 
 // Sets the operating mode of the device. Use the macros to indicate operating mode.
-void TMAG5170::setOperatingMode(uint32_t operating_mode) {
+void TMAG5170::setOperatingMode(uint16_t operating_mode) {
     TMAG5170_registers[DEVICE_CONFIG] &= ~OPERATING_MODE_MASK;
     TMAG5170_registers[DEVICE_CONFIG] |= operating_mode;
     writeRegister(DEVICE_CONFIG);
+
     return;
 }
 
 // Sets the number of averages per conversion of the device. Use the macros to indicate conversion average.
-void TMAG5170::setConversionAverage(uint32_t conversion_average) {
+void TMAG5170::setConversionAverage(uint16_t conversion_average) {
     TMAG5170_registers[DEVICE_CONFIG] &= ~CONV_AVG_MASK;
     TMAG5170_registers[DEVICE_CONFIG] |= conversion_average;
     writeRegister(DEVICE_CONFIG);
+
     return;
+}
+
+// Enables angle calculation.
+void TMAG5170::enableAngleCalculation(uint16_t angle_calculation_config) {
+    TMAG5170_registers[SENSOR_CONFIG] &= ~ANGLE_EN_MASK;
+    TMAG5170_registers[SENSOR_CONFIG] |= angle_calculation_config;
+    writeRegister(SENSOR_CONFIG);
+
+    return;
+}
+
+// Enables conversion on a selection of the three magnetic axes.
+void TMAG5170::enableMagneticChannel(bool x_enable, bool y_enable, bool z_enable) {
+    TMAG5170_registers[SENSOR_CONFIG] &= ~MAG_CH_EN_MASK;
+    if(x_enable) {
+        TMAG5170_registers[SENSOR_CONFIG] |= 0x0040;
+    }
+    if(y_enable) {
+        TMAG5170_registers[SENSOR_CONFIG] |= 0x0080;
+    }
+    if(z_enable) {
+        TMAG5170_registers[SENSOR_CONFIG] |= 0x0100;
+    }
+    writeRegister(SENSOR_CONFIG);
+
+    return;
+}
+
+// Sets the magnetic field range of the respective axes.
+void TMAG5170::setMagneticRange(uint16_t x_range, uint16_t y_range, uint16_t z_range) {
+    TMAG5170_registers[SENSOR_CONFIG] &= ~(X_RANGE_MASK | Y_RANGE_MASK | Z_RANGE_MASK);
+    TMAG5170_registers[SENSOR_CONFIG] |= x_range | y_range | z_range;
+    writeRegister(SENSOR_CONFIG);
+
+    return;
+}
+
+// Enables ALERT output to signal microcontroller conversion is finished.
+void TMAG5170:: enableAlertOutput(bool enable) {
+    TMAG5170_registers[ALERT_CONFIG] &= ~RSLT_ALRT_Asserted;
+    if(enable) {
+        TMAG5170_registers[ALERT_CONFIG] |= RSLT_ALRT_Asserted;
+    }
+    writeRegister(ALERT_CONFIG);
+
+    return;
+}
+
+// Reads the conversion result of the magnetic field on the X axis.
+// Returns the raw 16-bit value in the register.
+uint16_t TMAG5170::readXRaw(bool start_conversion_spi) {
+    return readRegister(X_CH_RESULT, start_conversion_spi);
+}
+
+// Reads the conversion result of the magnetic field on the Y axis.
+// Returns the raw 16-bit value in the register.
+uint16_t TMAG5170::readYRaw(bool start_conversion_spi) {
+    return readRegister(Y_CH_RESULT, start_conversion_spi);
+}
+
+// Reads the conversion result of the magnetic field on the Z axis.
+// Returns the raw 16-bit value in the register.
+uint16_t TMAG5170::readZRaw(bool start_conversion_spi) {
+    return readRegister(Z_CH_RESULT, start_conversion_spi);
 }

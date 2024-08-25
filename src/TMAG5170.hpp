@@ -318,8 +318,16 @@ class TMAG5170 {
         void writeRegister(uint8_t offset, bool start_conversion_spi = false);
 
         TMAG5170_version init(void);
-        void setOperatingMode(uint32_t operating_mode);
-        void setConversionAverage(uint32_t conversion_average);
+        void setOperatingMode(uint16_t operating_mode);
+        void setConversionAverage(uint16_t conversion_average);
+        void enableAngleCalculation(uint16_t angle_calculation_config);
+        void enableMagneticChannel(bool x_enable, bool y_enable, bool z_enable);
+        void setMagneticRange(uint16_t x_range, uint16_t y_range, uint16_t z_range);
+        void enableAlertOutput(bool enable);
+
+        uint16_t readXRaw(bool start_conversion_spi = false);
+        uint16_t readYRaw(bool start_conversion_spi = false);
+        uint16_t readZRaw(bool start_conversion_spi = false);
 };
 
 #endif
