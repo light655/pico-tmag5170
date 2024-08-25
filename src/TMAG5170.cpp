@@ -123,10 +123,19 @@ TMAG5170_version TMAG5170::init(void) {
     TEST16 = readRegister(TEST_CONFIG);
     if(((TEST16 & 0x0030) >> 4) == 0x0) {
         version = A1;
+        magnetic_coeff[0] = 50.0f / 32768.0f;
+        magnetic_coeff[1] = 50.0f / 32768.0f;
+        magnetic_coeff[2] = 50.0f / 32768.0f;
     } else if(((TEST16 & 0x0030) >> 4) == 0x1) {
         version = A2;
+        magnetic_coeff[0] = 150.0f / 32768.0f;
+        magnetic_coeff[1] = 150.0f / 32768.0f;
+        magnetic_coeff[2] = 150.0f / 32768.0f;
     } else {
         version = ERROR;
+        magnetic_coeff[0] = 0.0f;
+        magnetic_coeff[1] = 0.0f;
+        magnetic_coeff[2] = 0.0f;
     }
     return version;
 }
@@ -181,6 +190,51 @@ void TMAG5170::setMagneticRange(uint16_t x_range, uint16_t y_range, uint16_t z_r
     TMAG5170_registers[SENSOR_CONFIG] |= x_range | y_range | z_range;
     writeRegister(SENSOR_CONFIG);
 
+    switch(x_range) {
+    case X_RANGE_50mT:
+        if(version == A1) magnetic_coeff[0] = 50.0f / 32768.0f;
+        if(version == A2) magnetic_coeff[0] = 150.0f / 32768.0f;
+        break;
+    case X_RANGE_25mT:
+        if(version == A1) magnetic_coeff[0] = 25.0f / 32768.0f;
+        if(version == A2) magnetic_coeff[0] = 75.0f / 32768.0f;
+        break;
+    case X_RANGE_100mT:
+        if(version == A1) magnetic_coeff[0] = 100.0f / 32768.0f;
+        if(version == A2) magnetic_coeff[0] = 300.0f / 32768.0f;
+        break;
+    }
+
+    switch(y_range) {
+    case Y_RANGE_50mT:
+        if(version == A1) magnetic_coeff[1] = 50.0f / 32768.0f;
+        if(version == A2) magnetic_coeff[1] = 150.0f / 32768.0f;
+        break;
+    case Y_RANGE_25mT:
+        if(version == A1) magnetic_coeff[1] = 25.0f / 32768.0f;
+        if(version == A2) magnetic_coeff[1] = 75.0f / 32768.0f;
+        break;
+    case Y_RANGE_100mT:
+        if(version == A1) magnetic_coeff[1] = 100.0f / 32768.0f;
+        if(version == A2) magnetic_coeff[1] = 300.0f / 32768.0f;
+        break;
+    }
+
+    switch(z_range) {
+    case Z_RANGE_50mT:
+        if(version == A1) magnetic_coeff[2] = 50.0f / 32768.0f;
+        if(version == A2) magnetic_coeff[2] = 150.0f / 32768.0f;
+        break;
+    case Z_RANGE_25mT:
+        if(version == A1) magnetic_coeff[2] = 25.0f / 32768.0f;
+        if(version == A2) magnetic_coeff[2] = 75.0f / 32768.0f;
+        break;
+    case Z_RANGE_100mT:
+        if(version == A1) magnetic_coeff[2] = 100.0f / 32768.0f;
+        if(version == A2) magnetic_coeff[2] = 300.0f / 32768.0f;
+        break;
+    }
+
     return;
 }
 
@@ -211,4 +265,28 @@ uint16_t TMAG5170::readYRaw(bool start_conversion_spi) {
 // Returns the raw 16-bit value in the register.
 uint16_t TMAG5170::readZRaw(bool start_conversion_spi) {
     return readRegister(Z_CH_RESULT, start_conversion_spi);
+}
+
+// Reads the conversion result of the magnetic field on the X axis.
+// Returns the magnetic field component in mT.
+float TMAG5170::readX(bool start_conversion_spi) {
+    conversion_container container;
+    container.unsigned16 = readRegister(X_CH_RESULT, start_conversion_spi);
+    return container.signed16 * magnetic_coeff[0];
+}
+
+// Reads the conversion result of the magnetic field on the Y axis.
+// Returns the magnetic field component in mT.
+float TMAG5170::readY(bool start_conversion_spi) {
+    conversion_container container;
+    container.unsigned16 = readRegister(Y_CH_RESULT, start_conversion_spi);
+    return container.signed16 * magnetic_coeff[1];
+}
+
+// Reads the conversion result of the magnetic field on the Z axis.
+// Returns the magnetic field component in mT.
+float TMAG5170::readZ(bool start_conversion_spi) {
+    conversion_container container;
+    container.unsigned16 = readRegister(Z_CH_RESULT, start_conversion_spi);
+    return container.signed16 * magnetic_coeff[2];
 }

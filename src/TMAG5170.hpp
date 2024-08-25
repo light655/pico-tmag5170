@@ -283,7 +283,7 @@
 #include "pico/stdlib.h"
 
 enum TMAG5170_version {
-    A1 = 0x0, A2 = 0x1, ERROR =0x3
+    A1 = 0x0, A2 = 0x1, ERROR = 0x3
 };
 
 class TMAG5170 {
@@ -292,6 +292,11 @@ class TMAG5170 {
             uint8_t byte_arr[4];
             uint32_t data32;
         } TMAG5170_SPI_frame;
+
+        typedef union {
+            uint16_t unsigned16;
+            int16_t signed16;
+        } conversion_container;
 
         TMAG5170_version version;
         spi_inst_t *spi;
@@ -306,6 +311,7 @@ class TMAG5170 {
             0x0000, 0x0000, 0x0000, 0x0000,
             0x0000
         };
+        float magnetic_coeff[3];
 
     public:
         TMAG5170(void);
@@ -328,6 +334,9 @@ class TMAG5170 {
         uint16_t readXRaw(bool start_conversion_spi = false);
         uint16_t readYRaw(bool start_conversion_spi = false);
         uint16_t readZRaw(bool start_conversion_spi = false);
+        float readX(bool start_conversion_spi = false);
+        float readY(bool start_conversion_spi = false);
+        float readZ(bool start_conversion_spi = false);
 };
 
 #endif
