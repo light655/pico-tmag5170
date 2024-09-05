@@ -1,12 +1,12 @@
 #include "TMAG5170.hpp"
 
-// Contructor, provide the version of the device as the argument
+// Contructor for TMAG5170 object
 TMAG5170::TMAG5170(void) {
 
     return;
 }
 
-// Attach and initialise SPI on Pico for TMAG5170, default buadrate is 100kHz
+// Attach and initialise SPI on Pico for TMAG5170
 void TMAG5170::attachSPI(spi_inst_t *spi, uint spi_sck_pin, uint spi_mosi_pin, uint spi_miso_pin, uint spi_cs_pin, uint buadrate) {
     this->spi = spi;                    // set spi instance class variable
     spi_init(spi, buadrate);

@@ -315,7 +315,7 @@ class TMAG5170 {
 
     public:
         TMAG5170(void);
-        void attachSPI(spi_inst_t *spi, uint spi_sck_pin, uint spi_mosi_pin, uint spi_miso_pin, uint spi_cs_pin, uint buadrate = 100000);
+        void attachSPI(spi_inst_t *spi, uint spi_sck_pin, uint spi_mosi_pin, uint spi_miso_pin, uint spi_cs_pin, uint buadrate);
 
         uint32_t generateCRC(uint32_t data);
         int checkCRC(uint32_t received_frame);
