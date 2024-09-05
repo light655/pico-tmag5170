@@ -16,18 +16,18 @@ int main(void) {
     sleep_ms(5000);
     printf("Hello world!\n");
 
-    myTMAG.attachSPI(spi0, 18, 19, 20, 21, 2e6);
+    myTMAG.attachSPI(spi0, 18, 19, 20, 21, 2e6);    // attach SPI ad 2MHz
     myTMAG.init();
     myTMAG.setConversionAverage(CONV_AVG_32x);
     myTMAG.setOperatingMode(OPERATING_MODE_ActiveMeasureMode);
     myTMAG.enableMagneticChannel(true, true, true);
     myTMAG.setMagneticRange(X_RANGE_300mT, Y_RANGE_300mT, Z_RANGE_300mT);
-    myTMAG.enableAlertOutput(true);
+    myTMAG.enableAlertOutput(true);                 // enable ALERT output for conversion ready interrupt
 
     gpio_set_irq_enabled_with_callback(TMAG_ALERT, GPIO_IRQ_EDGE_FALL, true, &alertCallback);
 
     while(true) {
-        tight_loop_contents();
+        tight_loop_contents();                      // spin the processor and wait for interrupts
     }
 
     return 0;
