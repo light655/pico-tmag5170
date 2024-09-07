@@ -29,6 +29,12 @@ target_link_libraries(your_project_name
 #include "TMAG5170.h"
 ```
 
+## Notes
+
+- This library uses version 2.0.0+ Pico-SDK
+- The SPI functions in this library is written in a blocking fashion in order to implement CRC with every transaction with the TMAG5170.
+- To operate the TMAG5170 at maximum speed, a SPI clock frequency of 2 MHz or more is required.
+
 ## Examples
 
 ### Continuous conversion

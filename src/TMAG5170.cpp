@@ -251,19 +251,19 @@ void TMAG5170:: enableAlertOutput(bool enable) {
 
 // Reads the conversion result of the magnetic field on the X axis.
 // Returns the raw 16-bit value in the register.
-uint16_t TMAG5170::readXRaw(bool start_conversion_spi) {
+int16_t TMAG5170::readXRaw(bool start_conversion_spi) {
     return readRegister(X_CH_RESULT, start_conversion_spi);
 }
 
 // Reads the conversion result of the magnetic field on the Y axis.
 // Returns the raw 16-bit value in the register.
-uint16_t TMAG5170::readYRaw(bool start_conversion_spi) {
+int16_t TMAG5170::readYRaw(bool start_conversion_spi) {
     return readRegister(Y_CH_RESULT, start_conversion_spi);
 }
 
 // Reads the conversion result of the magnetic field on the Z axis.
 // Returns the raw 16-bit value in the register.
-uint16_t TMAG5170::readZRaw(bool start_conversion_spi) {
+int16_t TMAG5170::readZRaw(bool start_conversion_spi) {
     return readRegister(Z_CH_RESULT, start_conversion_spi);
 }
 

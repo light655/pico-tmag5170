@@ -331,9 +331,9 @@ class TMAG5170 {
         void setMagneticRange(uint16_t x_range, uint16_t y_range, uint16_t z_range);
         void enableAlertOutput(bool enable);
 
-        uint16_t readXRaw(bool start_conversion_spi = false);
-        uint16_t readYRaw(bool start_conversion_spi = false);
-        uint16_t readZRaw(bool start_conversion_spi = false);
+        int16_t readXRaw(bool start_conversion_spi = false);
+        int16_t readYRaw(bool start_conversion_spi = false);
+        int16_t readZRaw(bool start_conversion_spi = false);
         float readX(bool start_conversion_spi = false);
         float readY(bool start_conversion_spi = false);
         float readZ(bool start_conversion_spi = false);
