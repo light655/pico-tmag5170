@@ -43,6 +43,12 @@ In this example, the device is configured to measure the magnetic field on all 3
 
 Note that the data in the example is printed to UART. To print it over USB, swap the 0 and 1 in lines 36 and 37 in examples/continuous_measuring/CMakeLists.txt
 
+### Measure and send to Python client
+
+In this example, the device is configured to measure the magnetic field on all 3 axes at maximum speed. The measured data is sent as bytes through USB to a Python script. The device will perform a number of conversions(set in the Python program's input) at 10000 SPS.
+
+Note that stdio has to be over USB for this example to work as intended. The pyserial module is required for the Python script.
+
 ## References
 - [TMAG5170 datasheet](https://www.ti.com/lit/ds/symlink/tmag5170.pdf?ts=1724587283732&ref_url=https%253A%252F%252Fwww.ti.com%252Fproduct%252FTMAG5170)
 - [My blog on more details about the TMAG5170](https://hackmd.io/8zu9jVyARfWYGYuD4Jl_aQ)

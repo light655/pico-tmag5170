@@ -9,7 +9,7 @@
 #include "TMAG5170.hpp"
 #define TMAG_ALERT 17
 
-typedef union {
+typedef union {             // container to convert between byte array and 32-bit int
     uint32_t unsigned32;
     uint8_t byte_arr[4];
 } container32_t;
@@ -52,14 +52,14 @@ int main(void) {
     return 0;
 }
 
-union measure_frame {
+union measure_frame {   // frame to hold 1 measurement data
     struct {
         uint32_t t1;
         int16_t Bx;
         int16_t By;
         int16_t Bz;
     } S;
-    char arr[10];
+    char arr[10];       // unioned with char array for easier iteration when sending data through USB
 };
 
 void alertCallback(uint gpio, uint32_t events) {
