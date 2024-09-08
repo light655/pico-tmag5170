@@ -4,6 +4,8 @@ A TMAG5170 Hall-effect sensor library for Raspberry Pi Pico SDK.
 ## Intro
 TMAG5170 is a high-precision 3D Hall-effect sensor IC designed by Texas Instruments. It measures the magnetic field in all 3 axes, with a sampling rate of up to 10 kSPS. Communication with TMAG5170 is based on SPI, with maximum frequency of 10 MHz and cyclic redundancy check. There are two versions, A1 and A2, of TMAG5170 with different measuring ranges.
 
+If you are using Arduino, there is an [Arduino version of this library](https://github.com/light655/arduino-tmag5170/).
+
 ## Usage
 - Copy the two files in src (TMAG5170.cpp, TMAG5170.hpp) into your pico project.
 - Add the TMAG5170 library to your CMakeLists.txt
