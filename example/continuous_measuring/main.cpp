@@ -5,7 +5,7 @@
 #include "pico/stdlib.h"
 
 #include "TMAG5170.hpp"
-#define TMAG_ALERT 17
+#define TMAG_ALERT 20
 
 void alertCallback(uint, uint32_t);
 
@@ -16,7 +16,7 @@ int main(void) {
     sleep_ms(5000);
     printf("Hello world!\n");
 
-    myTMAG.attachSPI(spi0, 18, 19, 20, 21, 2e6);    // attach SPI ad 2MHz
+    myTMAG.attachSPI(spi0, 18, 19, 16, 17, 2e6);    // attach SPI at 2MHz
     myTMAG.init();
     myTMAG.setConversionAverage(CONV_AVG_32x);
     myTMAG.setOperatingMode(OPERATING_MODE_ActiveMeasureMode);
@@ -24,10 +24,12 @@ int main(void) {
     myTMAG.setMagneticRange(X_RANGE_300mT, Y_RANGE_300mT, Z_RANGE_300mT);
     myTMAG.enableAlertOutput(true);                 // enable ALERT output for conversion ready interrupt
 
+    gpio_set_dir(TMAG_ALERT, GPIO_IN);
+    gpio_pull_up(TMAG_ALERT);
     gpio_set_irq_enabled_with_callback(TMAG_ALERT, GPIO_IRQ_EDGE_FALL, true, &alertCallback);
 
     while(true) {
-        tight_loop_contents();                      // spin the processor and wait for interrupts
+        sleep_ms(1000);                      // sleep the processor and wait for interrupts
     }
 
     return 0;

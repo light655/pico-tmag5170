@@ -58,7 +58,7 @@ int TMAG5170::checkCRC(uint32_t received_frame) {
 // Returns the received frame. Does not check the CRC of the received frame.
 uint32_t TMAG5170::exchangeFrame(uint32_t frame) {
     TMAG5170_SPI_frame send_frame, receive_frame;
-    send_frame.data32 = __bswap32(frame);   // swap the bytes to match the order when viewed as array
+    send_frame.data32 = __builtin_bswap32(frame);   // swap the bytes to match the order when viewed as array
 
     gpio_put(spi_cs_pin, 0);
     for(int i = 0; i < 4; i++) {
@@ -70,7 +70,7 @@ uint32_t TMAG5170::exchangeFrame(uint32_t frame) {
     ERROR_STAT = (uint16_t)receive_frame.byte_arr[0];
     ERROR_STAT <<= 4;
     ERROR_STAT |= ((uint16_t)receive_frame.byte_arr[3] & 0xf0) >> 4;
-    return __bswap32(receive_frame.data32);
+    return __builtin_bswap32(receive_frame.data32);
 }
 
 // Reads the content of the register at the offset in the argument. This function attempts to read the register until the CRC is correct.

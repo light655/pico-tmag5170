@@ -22,11 +22,14 @@ TMAG5170 myTMAG;
 int main(void) {
     stdio_init_all();
 
-    myTMAG.attachSPI(spi0, 18, 19, 20, 21, 2e6);    // attach SPI ad 2MHz
+    myTMAG.attachSPI(spi0, 18, 19, 16, 17, 2e6);    // attach SPI ad 2MHz
     myTMAG.init();
     myTMAG.setConversionAverage(CONV_AVG_1x);
     myTMAG.enableMagneticChannel(true, true, true);
     myTMAG.setMagneticRange(X_RANGE_300mT, Y_RANGE_300mT, Z_RANGE_300mT);
+
+    gpio_set_dir(TMAG_ALERT, GPIO_IN);
+    gpio_pull_up(TMAG_ALERT);
 
     while(true) {
         while(getchar_timeout_us(1000) != 'S') {
