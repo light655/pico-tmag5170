@@ -322,6 +322,7 @@ class TMAG5170 {
         uint32_t exchangeFrame(uint32_t frame);
         uint16_t readRegister(uint8_t offset, bool start_conversion_spi = false);
         void writeRegister(uint8_t offset, bool start_conversion_spi = false);
+        uint16_t readERRORSTAT(void);
 
         TMAG5170_version init(void);
         void setOperatingMode(uint16_t operating_mode);

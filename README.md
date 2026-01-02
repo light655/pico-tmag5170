@@ -53,4 +53,4 @@ Note that stdio has to be over USB for this example to work as intended. The pys
 
 ## References
 - [TMAG5170 datasheet](https://www.ti.com/lit/ds/symlink/tmag5170.pdf?ts=1724587283732&ref_url=https%253A%252F%252Fwww.ti.com%252Fproduct%252FTMAG5170)
-- [My blog on more details about the TMAG5170](https://hackmd.io/8zu9jVyARfWYGYuD4Jl_aQ)
+- [My blog on more details about the TMAG5170](https://light655.github.io/2024/11/20/TMAG5170/)

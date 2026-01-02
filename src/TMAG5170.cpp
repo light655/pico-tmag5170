@@ -108,6 +108,11 @@ void TMAG5170::writeRegister(uint8_t offset, bool start_conversion_spi) {
     return;
 }
 
+// Reads the ERROR_STAT register content stored in the class variable.
+uint16_t TMAG5170::readERRORSTAT(void) {
+    return ERROR_STAT;
+}
+
 // Initialises TMAG5170, clears the CFG_REST bit and reads the version of the device.
 // Returns the version of the device.
 TMAG5170_version TMAG5170::init(void) {
@@ -121,12 +126,12 @@ TMAG5170_version TMAG5170::init(void) {
 
     uint16_t TEST16;
     TEST16 = readRegister(TEST_CONFIG);
-    if(((TEST16 & 0x0030) >> 4) == 0x0) {
+    if((TEST16 & 0x0030) == (0x0 << 4)) {
         version = A1;
         magnetic_coeff[0] = 50.0f / 32768.0f;
         magnetic_coeff[1] = 50.0f / 32768.0f;
         magnetic_coeff[2] = 50.0f / 32768.0f;
-    } else if(((TEST16 & 0x0030) >> 4) == 0x1) {
+    } else if((TEST16 & 0x0030) == (0x1 << 4)) {
         version = A2;
         magnetic_coeff[0] = 150.0f / 32768.0f;
         magnetic_coeff[1] = 150.0f / 32768.0f;

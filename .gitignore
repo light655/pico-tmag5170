@@ -1,4 +1,5 @@
 tool/upload.sh
 example/*/build
+example/test
 .vscode
 tmag5170-pyvenv
