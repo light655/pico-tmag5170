@@ -295,3 +295,31 @@ float TMAG5170::readZ(bool start_conversion_spi) {
     container.unsigned16 = readRegister(Z_CH_RESULT, start_conversion_spi);
     return container.signed16 * magnetic_coeff[2];
 }
+
+// Reads the conversion result of the angle of the magnetic field.
+// Returns the raw 16-bit value in the register.
+int16_t TMAG5170::readAngleRaw(bool start_conversion_spi) {
+    return readRegister(ANGLE_RESULT, start_conversion_spi);
+}
+
+// Reads the conversion result of the angle of the magnetic field.
+// Returns the angle in degrees.
+float TMAG5170::readAngle(bool start_conversion_spi) {
+    conversion_container container;
+    container.unsigned16 = readRegister(ANGLE_RESULT, start_conversion_spi);
+    return container.signed16 / 16.0f;
+}
+
+// Reads the conversion result of the magnitude of the magnetic field.
+// Returns the raw 16-bit value in the register.
+int16_t TMAG5170::readMagnitudeRaw(bool start_conversion_spi) {
+    return readRegister(MAGNITUDE_RESULT, start_conversion_spi);
+}
+
+// Reads the conversion result of the magnitude of the magnetic field.
+// Returns the magnitude in mT.
+// float TMAG5170::readMagnitude(bool start_conversion_spi) {
+//     conversion_container container;
+//     container.unsigned16 = readRegister(MAGNITUDE_RESULT, start_conversion_spi);
+//     return container.signed16 * magnetic_coeff[2];
+// }

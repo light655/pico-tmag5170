@@ -338,6 +338,11 @@ class TMAG5170 {
         float readX(bool start_conversion_spi = false);
         float readY(bool start_conversion_spi = false);
         float readZ(bool start_conversion_spi = false);
+
+        int16_t readAngleRaw(bool start_conversion_spi = false);
+        float readAngle(bool start_conversion_spi = false);
+        int16_t readMagnitudeRaw(bool start_conversion_spi = false);
+        // float readMagnitude(bool start_conversion_spi = false);
 };
 
 #endif

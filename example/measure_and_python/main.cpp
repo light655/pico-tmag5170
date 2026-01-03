@@ -7,7 +7,7 @@
 #include "pico/stdio.h"
 
 #include "TMAG5170.hpp"
-#define TMAG_ALERT 17
+#define TMAG_ALERT 20
 
 typedef union {             // container to convert between byte array and 32-bit int
     uint32_t unsigned32;
