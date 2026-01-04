@@ -1,3 +1,14 @@
+/**
+ * @file TMAG5170.hpp
+ * @author Chen, Liang-Yu
+ * @brief TMAG5170 library for Raspberry Pi Pico-SDK
+ * @version 0.1
+ * @date 2026-01-03
+ * 
+ * @copyright Copyright (c) 2026
+ * 
+ */
+
 #ifndef TMAG5170_H
 #define TMAG5170_H
 
@@ -282,10 +293,18 @@
 #include "hardware/spi.h"
 #include "pico/stdlib.h"
 
+/**
+ * @brief Enumeration for TMAG5170 version: A1 or A2.
+ * 
+ */
 enum TMAG5170_version {
     A1 = 0x0, A2 = 0x1, ERROR = 0x3
 };
 
+/**
+ * @brief Class for TMAG5170.
+ * 
+ */
 class TMAG5170 {
     private:
         typedef union {

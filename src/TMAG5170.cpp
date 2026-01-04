@@ -1,12 +1,35 @@
+/**
+ * @file TMAG5170.cpp
+ * @author Chen, Liang-Yu
+ * @brief TMAG5170 library for Raspberry Pi Pico-SDK.
+ * @version 0.1
+ * @date 2026-01-03
+ * 
+ * @copyright Copyright (c) 2026
+ * 
+ */
+
 #include "TMAG5170.hpp"
 
-// Contructor for TMAG5170 object
+/**
+ * @brief Construct a new TMAG5170::TMAG5170 object
+ * 
+ */
 TMAG5170::TMAG5170(void) {
 
     return;
 }
 
-// Attach and initialise SPI on Pico for TMAG5170
+/**
+ * @brief Attach and initialise SPI on the Pico for TMAG5170
+ * 
+ * @param spi SPI instance specifier, either spi0 or spi1.
+ * @param spi_sck_pin SPI SCK GPIO pin number.
+ * @param spi_mosi_pin SPI MOSI GPIO pin number.
+ * @param spi_miso_pin SPI MISO GPIO pin number.
+ * @param spi_cs_pin SPI CS GPIO pin number.
+ * @param buadrate Baudrate in Hz. The TMAG5170 supports up to 10 MHz SPI baudrate.
+ */
 void TMAG5170::attachSPI(spi_inst_t *spi, uint spi_sck_pin, uint spi_mosi_pin, uint spi_miso_pin, uint spi_cs_pin, uint buadrate) {
     this->spi = spi;                    // set spi instance class variable
     spi_init(spi, buadrate);
@@ -24,7 +47,12 @@ void TMAG5170::attachSPI(spi_inst_t *spi, uint spi_sck_pin, uint spi_mosi_pin, u
     return;
 }
 
-// Generates CRC for SPI communication. The input data should contain no 1 in the last 4 bits.
+/**
+ * @brief Generate CRC for SPI communication.
+ * 
+ * @param data 32-bit data to generate CRC for. The last four bits should be all 0's.
+ * @return uint32_t containing the four CRC bits.
+ */
 uint32_t TMAG5170::generateCRC(uint32_t data) {
     uint32_t CRC = 0xf;     // least significant 4 bits are the shift register
 
@@ -41,8 +69,12 @@ uint32_t TMAG5170::generateCRC(uint32_t data) {
     return CRC;
 }
 
-// Checks the CRC of the received frame. 
-// Returns nonzero value if CRC is incorrect.
+/**
+ * @brief Check the CRC of the received frame.
+ * 
+ * @param received_frame 32-bit data of the received frame.
+ * @return Return nonzero value if CRC is incorrect. 
+ */
 int TMAG5170::checkCRC(uint32_t received_frame) {
     uint32_t received_CRC_calculated = generateCRC(received_frame & 0xfffffff0);
         // clear the CRC bits and calculate the CRC
@@ -54,8 +86,12 @@ int TMAG5170::checkCRC(uint32_t received_frame) {
     }
 }
 
-// Exchanges an SPI frame with TMAG5170, the frame argument should include the CRC. 
-// Returns the received frame. Does not check the CRC of the received frame.
+/**
+ * @brief Exchange an SPI frame with TMAG5170.
+ * 
+ * @param frame 32-bit data of the frame to send. CRC needs to be included in this frame.
+ * @return uint32_t containing the received frame. CRC is not checked for the received frame.
+ */
 uint32_t TMAG5170::exchangeFrame(uint32_t frame) {
     TMAG5170_SPI_frame send_frame, receive_frame;
     send_frame.data32 = __builtin_bswap32(frame);   // swap the bytes to match the order when viewed as array
@@ -73,8 +109,13 @@ uint32_t TMAG5170::exchangeFrame(uint32_t frame) {
     return __builtin_bswap32(receive_frame.data32);
 }
 
-// Reads the content of the register at the offset in the argument. This function attempts to read the register until the CRC is correct.
-// Set start_conversion_spi to initiate conversion when the CS line goes high.
+/**
+ * @brief Read the content of the register at the offset in the argument. This function attempts to read the register until the CRC is correct.
+ * 
+ * @param offset Offset of the register to read.
+ * @param start_conversion_spi Set true to initiate conversion when the CS line goes high after the register read.
+ * @return Register content read from the TMAG5170.
+ */
 uint16_t TMAG5170::readRegister(uint8_t offset, bool start_conversion_spi) {
     uint32_t sent_frame = ((uint32_t)offset | READ_REG) << 24;
     if(start_conversion_spi) sent_frame |= START_CONVERSION;
@@ -92,8 +133,12 @@ uint16_t TMAG5170::readRegister(uint8_t offset, bool start_conversion_spi) {
     return register_content;
 }
 
-// Writes the register content stored in the array into the register at the offset provided in the argument. This function attempts to write the register until the returning CRC is correct.
-// Set start_conversion_spi to initiate conversion when the CS line goes high.
+/**
+ * @brief Write the register content stored in the array into the register at the offset provided in the argument. This function attempts to write the register until the returning CRC is correct.
+ * 
+ * @param offset Offset of the register to write.
+ * @param start_conversion_spi Set true to initiate conversion when the CS line goes high after the register read.
+ */
 void TMAG5170::writeRegister(uint8_t offset, bool start_conversion_spi) {
     uint16_t register_content = TMAG5170_registers[offset];
     uint32_t sent_frame = ((uint32_t)offset << 24) | ((uint32_t)register_content << 8);
@@ -108,13 +153,20 @@ void TMAG5170::writeRegister(uint8_t offset, bool start_conversion_spi) {
     return;
 }
 
-// Reads the ERROR_STAT register content stored in the class variable.
+/**
+ * @brief Read the ERROR_STAT bits of the previously received frame.
+ * 
+ * @return uint16_t containing the ERROR_STAT bits.
+ */
 uint16_t TMAG5170::readERRORSTAT(void) {
     return ERROR_STAT;
 }
 
-// Initialises TMAG5170, clears the CFG_REST bit and reads the version of the device.
-// Returns the version of the device.
+/**
+ * @brief Initialise TMAG5170, clear the CFG_REST bit and reads the version of the device.
+ * 
+ * @return Version of the device, A1 or A2.
+ */
 TMAG5170_version TMAG5170::init(void) {
     uint16_t AFE16;                     // reads the AFE_STATUS register twice, the MSB should be 0 by the second time.
     AFE16 = readRegister(AFE_STATUS);
@@ -145,7 +197,11 @@ TMAG5170_version TMAG5170::init(void) {
     return version;
 }
 
-// Sets the operating mode of the device. Use the macros to indicate operating mode.
+/**
+ * @brief Set the operating mode of the TMAG5170.
+ * 
+ * @param operating_mode Use macros to specify the operating mode.
+ */
 void TMAG5170::setOperatingMode(uint16_t operating_mode) {
     TMAG5170_registers[DEVICE_CONFIG] &= ~OPERATING_MODE_MASK;
     TMAG5170_registers[DEVICE_CONFIG] |= operating_mode;
@@ -154,7 +210,11 @@ void TMAG5170::setOperatingMode(uint16_t operating_mode) {
     return;
 }
 
-// Sets the number of averages per conversion of the device. Use the macros to indicate conversion average.
+/**
+ * @brief Set the number of averages to take for each conversion.
+ * 
+ * @param conversion_average Use macros to specify the number of averages.
+ */
 void TMAG5170::setConversionAverage(uint16_t conversion_average) {
     TMAG5170_registers[DEVICE_CONFIG] &= ~CONV_AVG_MASK;
     TMAG5170_registers[DEVICE_CONFIG] |= conversion_average;
@@ -163,7 +223,11 @@ void TMAG5170::setConversionAverage(uint16_t conversion_average) {
     return;
 }
 
-// Enables angle calculation.
+/**
+ * @brief Enable angle calculation.
+ * 
+ * @param angle_calculation_config Use macros to specify the two axes used for angle calculation.
+ */
 void TMAG5170::enableAngleCalculation(uint16_t angle_calculation_config) {
     TMAG5170_registers[SENSOR_CONFIG] &= ~ANGLE_EN_MASK;
     TMAG5170_registers[SENSOR_CONFIG] |= angle_calculation_config;
@@ -172,7 +236,13 @@ void TMAG5170::enableAngleCalculation(uint16_t angle_calculation_config) {
     return;
 }
 
-// Enables conversion on a selection of the three magnetic axes.
+/**
+ * @brief Enable conversion on a selection of the three magnetic axes.
+ * 
+ * @param x_enable Enable X axis.
+ * @param y_enable Enable Y axis.
+ * @param z_enable Enable Z axis.
+ */
 void TMAG5170::enableMagneticChannel(bool x_enable, bool y_enable, bool z_enable) {
     TMAG5170_registers[SENSOR_CONFIG] &= ~MAG_CH_EN_MASK;
     if(x_enable) {
@@ -189,7 +259,13 @@ void TMAG5170::enableMagneticChannel(bool x_enable, bool y_enable, bool z_enable
     return;
 }
 
-// Sets the magnetic field range of the respective axes.
+/**
+ * @brief Set magnetic field measurement range on each axis.
+ * 
+ * @param x_range Use macros to specify the range of the X axis.
+ * @param y_range Use macros to specify the range of the Y axis.
+ * @param z_range Use macros to specify the range of the Z axis.
+ */
 void TMAG5170::setMagneticRange(uint16_t x_range, uint16_t y_range, uint16_t z_range) {
     TMAG5170_registers[SENSOR_CONFIG] &= ~(X_RANGE_MASK | Y_RANGE_MASK | Z_RANGE_MASK);
     TMAG5170_registers[SENSOR_CONFIG] |= x_range | y_range | z_range;
@@ -243,7 +319,11 @@ void TMAG5170::setMagneticRange(uint16_t x_range, uint16_t y_range, uint16_t z_r
     return;
 }
 
-// Enables ALERT output to signal microcontroller conversion is finished.
+/**
+ * @brief Enable ALERT output to notify the microcontroller when the conversion is finished.
+ * 
+ * @param enable Set true to enable ALERT output.
+ */
 void TMAG5170:: enableAlertOutput(bool enable) {
     TMAG5170_registers[ALERT_CONFIG] &= ~RSLT_ALRT_Asserted;
     if(enable) {
@@ -254,64 +334,100 @@ void TMAG5170:: enableAlertOutput(bool enable) {
     return;
 }
 
-// Reads the conversion result of the magnetic field on the X axis.
-// Returns the raw 16-bit value in the register.
+/**
+ * @brief Read the raw 16-bit conversion result of the magnetic field on the X axis.
+ * 
+ * @param start_conversion_spi Set true to initiate conversion when the CS line goes high after the register read.
+ * @return The raw 16-bit value in the X_CH_RESULT register.
+ */
 int16_t TMAG5170::readXRaw(bool start_conversion_spi) {
     return readRegister(X_CH_RESULT, start_conversion_spi);
 }
 
-// Reads the conversion result of the magnetic field on the Y axis.
-// Returns the raw 16-bit value in the register.
+/**
+ * @brief Read the raw 16-bit conversion result of the magnetic field on the Y axis.
+ * 
+ * @param start_conversion_spi Set true to initiate conversion when the CS line goes high after the register read.
+ * @return The raw 16-bit value in the Y_CH_RESULT register.
+ */
 int16_t TMAG5170::readYRaw(bool start_conversion_spi) {
     return readRegister(Y_CH_RESULT, start_conversion_spi);
 }
 
-// Reads the conversion result of the magnetic field on the Z axis.
-// Returns the raw 16-bit value in the register.
+/**
+ * @brief Read the raw 16-bit conversion result of the magnetic field on the Z axis.
+ * 
+ * @param start_conversion_spi Set true to initiate conversion when the CS line goes high after the register read.
+ * @return The raw 16-bit value in the Z_CH_RESULT register.
+ */
 int16_t TMAG5170::readZRaw(bool start_conversion_spi) {
     return readRegister(Z_CH_RESULT, start_conversion_spi);
 }
 
-// Reads the conversion result of the magnetic field on the X axis.
-// Returns the magnetic field component in mT.
+/**
+ * @brief Read the conversion result in mT on the X axis.
+ * 
+ * @param start_conversion_spi Set true to initiate conversion when the CS line goes high after the register read.
+ * @return The magnetic field on the X axis in mT.
+ */
 float TMAG5170::readX(bool start_conversion_spi) {
     conversion_container container;
     container.unsigned16 = readRegister(X_CH_RESULT, start_conversion_spi);
     return container.signed16 * magnetic_coeff[0];
 }
 
-// Reads the conversion result of the magnetic field on the Y axis.
-// Returns the magnetic field component in mT.
+/**
+ * @brief Read the conversion result in mT on the Y axis.
+ * 
+ * @param start_conversion_spi Set true to initiate conversion when the CS line goes high after the register read.
+ * @return The magnetic field on the Y axis in mT.
+ */
 float TMAG5170::readY(bool start_conversion_spi) {
     conversion_container container;
     container.unsigned16 = readRegister(Y_CH_RESULT, start_conversion_spi);
     return container.signed16 * magnetic_coeff[1];
 }
 
-// Reads the conversion result of the magnetic field on the Z axis.
-// Returns the magnetic field component in mT.
+/**
+ * @brief Read the conversion result in mT on the Z axis.
+ * 
+ * @param start_conversion_spi Set true to initiate conversion when the CS line goes high after the register read.
+ * @return The magnetic field on the Z axis in mT.
+ */
 float TMAG5170::readZ(bool start_conversion_spi) {
     conversion_container container;
     container.unsigned16 = readRegister(Z_CH_RESULT, start_conversion_spi);
     return container.signed16 * magnetic_coeff[2];
 }
 
-// Reads the conversion result of the angle of the magnetic field.
-// Returns the raw 16-bit value in the register.
+/**
+ * @brief Read the raw 16-bit data of the angle of the magnetic field.
+ * 
+ * @param start_conversion_spi Set true to initiate conversion when the CS line goes high after the register read.
+ * @return The raw 16-bit data in the ANGLE_RESULT register.
+ */
 int16_t TMAG5170::readAngleRaw(bool start_conversion_spi) {
     return readRegister(ANGLE_RESULT, start_conversion_spi);
 }
 
-// Reads the conversion result of the angle of the magnetic field.
-// Returns the angle in degrees.
+/**
+ * @brief Read the angle of the magnetic field in degree.
+ * 
+ * @param start_conversion_spi Set true to initiate conversion when the CS line goes high after the register read.
+ * @return The angle of the magnetic field in degree in float. 
+ */
 float TMAG5170::readAngle(bool start_conversion_spi) {
     conversion_container container;
     container.unsigned16 = readRegister(ANGLE_RESULT, start_conversion_spi);
     return container.signed16 / 16.0f;
 }
 
-// Reads the conversion result of the magnitude of the magnetic field.
-// Returns the raw 16-bit value in the register.
+/**
+ * @brief Read the raw 16-bit magnitude of the magnetic field.
+ * 
+ * @param start_conversion_spi Set true to initiate conversion when the CS line goes high after the register read.
+ * @return The raw 16-bit data in the MAGNITUDE_RESULT register. 
+ */
 int16_t TMAG5170::readMagnitudeRaw(bool start_conversion_spi) {
     return readRegister(MAGNITUDE_RESULT, start_conversion_spi);
 }
