@@ -200,7 +200,7 @@ TMAG5170_version TMAG5170::init(void) {
 /**
  * @brief Set the operating mode of the TMAG5170.
  * 
- * @param operating_mode Use macros to specify the operating mode.
+ * @param operating_mode Use \ref OPERATING_MODE "macros" to specify the operating mode.
  */
 void TMAG5170::setOperatingMode(uint16_t operating_mode) {
     TMAG5170_registers[DEVICE_CONFIG] &= ~OPERATING_MODE_MASK;
@@ -213,7 +213,7 @@ void TMAG5170::setOperatingMode(uint16_t operating_mode) {
 /**
  * @brief Set the number of averages to take for each conversion.
  * 
- * @param conversion_average Use macros to specify the number of averages.
+ * @param conversion_average Use \ref CONV_AVG "macros" to specify the number of averages.
  */
 void TMAG5170::setConversionAverage(uint16_t conversion_average) {
     TMAG5170_registers[DEVICE_CONFIG] &= ~CONV_AVG_MASK;
@@ -226,7 +226,7 @@ void TMAG5170::setConversionAverage(uint16_t conversion_average) {
 /**
  * @brief Enable angle calculation.
  * 
- * @param angle_calculation_config Use macros to specify the two axes used for angle calculation.
+ * @param angle_calculation_config Use \ref ANGLE_AXES "macros" to specify the two axes used for angle calculation.
  */
 void TMAG5170::enableAngleCalculation(uint16_t angle_calculation_config) {
     TMAG5170_registers[SENSOR_CONFIG] &= ~ANGLE_EN_MASK;
@@ -262,9 +262,9 @@ void TMAG5170::enableMagneticChannel(bool x_enable, bool y_enable, bool z_enable
 /**
  * @brief Set magnetic field measurement range on each axis.
  * 
- * @param x_range Use macros to specify the range of the X axis.
- * @param y_range Use macros to specify the range of the Y axis.
- * @param z_range Use macros to specify the range of the Z axis.
+ * @param x_range Use \ref MAG_RANGE "macros" to specify the range of the X axis.
+ * @param y_range Use \ref MAG_RANGE "macros" to specify the range of the Y axis.
+ * @param z_range Use \ref MAG_RANGE "macros" to specify the range of the Z axis.
  */
 void TMAG5170::setMagneticRange(uint16_t x_range, uint16_t y_range, uint16_t z_range) {
     TMAG5170_registers[SENSOR_CONFIG] &= ~(X_RANGE_MASK | Y_RANGE_MASK | Z_RANGE_MASK);
