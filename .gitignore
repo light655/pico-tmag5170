@@ -3,3 +3,6 @@ example/*/build
 example/test
 .vscode
 tmag5170-pyvenv
+docs/html
+docs/latex
+docs/xml
