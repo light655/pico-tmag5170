@@ -1,30 +1,47 @@
+/**
+ * @file TMAG5170.hpp
+ * @author Chen, Liang-Yu
+ * @brief TMAG5170 library for Raspberry Pi Pico-SDK
+ * @version 0.1
+ * @date 2026-01-03
+ * 
+ * @copyright Copyright (c) 2026
+ * 
+ */
+
 #ifndef TMAG5170_H
 #define TMAG5170_H
 
 // -------------------- Register offset --------------------
-// Register offset to go into the 1st byte of the SPI frame.
+/** @brief Use READ_REG to set the MSB to read register */
 #define READ_REG 0x80
-// Use READ_REG to set the MSB to read register
-#define DEVICE_CONFIG 0x00
-#define SENSOR_CONFIG 0x01
-#define SYSTEM_CONFIG 0x02
-#define ALERT_CONFIG 0x03
-#define X_THRX_CONFIG 0x04
-#define Y_THRX_CONFIG 0x05
-#define Z_THRX_CONFIG 0x06
-#define T_THRX_CONFIG 0x07
-#define CONV_STATUS 0x08
-#define X_CH_RESULT 0x09
-#define Y_CH_RESULT 0x0A
-#define Z_CH_RESULT 0x0B
-#define TEMP_RESULT 0x0C
-#define AFE_STATUS 0x0D
-#define SYS_STATUS 0x0E
-#define TEST_CONFIG 0x0F
-#define OSC_MONITOR 0x10
-#define MAG_GAIN_CONFIG 0x11
-#define ANGLE_RESULT 0x13
-#define MAGNITUDE_RESULT 0x14
+/** @defgroup REG_OFFSET Register offset 
+ * Register offset to go into the 1st byte of the SPI frame.
+ * @{
+ */
+#define DEVICE_CONFIG 0x00      ///< @brief Offset of DEVICE_CONFIG register
+#define SENSOR_CONFIG 0x01      ///< @brief Offset of SENSOR_CONFIG register
+#define SYSTEM_CONFIG 0x02      ///< @brief Offset of SYSTEM_CONFIG register
+#define ALERT_CONFIG 0x03       ///< @brief Offset of ALERT_CONFIG register
+#define X_THRX_CONFIG 0x04      ///< @brief Offset of X_THRX_CONFIG register
+#define Y_THRX_CONFIG 0x05      ///< @brief Offset of Y_THRX_CONFIG register
+#define Z_THRX_CONFIG 0x06      ///< @brief Offset of Z_THRX_CONFIG register
+#define T_THRX_CONFIG 0x07      ///< @brief Offset of T_THRX_CONFIG register
+#define CONV_STATUS 0x08        ///< @brief Offset of CONV_STATUS register
+#define X_CH_RESULT 0x09        ///< @brief Offset of X_CH_RESULT register
+#define Y_CH_RESULT 0x0A        ///< @brief Offset of Y_CH_RESULT register
+#define Z_CH_RESULT 0x0B        ///< @brief Offset of Z_CH_RESULT register
+#define TEMP_RESULT 0x0C        ///< @brief Offset of TEMP_RESULT register
+#define AFE_STATUS 0x0D         ///< @brief Offset of AFE_STATUS register
+#define SYS_STATUS 0x0E         ///< @brief Offset of SYS_STATUS register
+#define TEST_CONFIG 0x0F        ///< @brief Offset of TEST_CONFIG register
+#define OSC_MONITOR 0x10        ///< @brief Offset of OSC_MONITOR register
+#define MAG_GAIN_CONFIG 0x11    ///< @brief Offset of MAG_GAIN_CONFIG register
+#define ANGLE_RESULT 0x13       ///< @brief Offset of ANGLE_RESULT register
+#define MAGNITUDE_RESULT 0x14   ///< @brief Offset of MAGNITUDE_RESULT register
+/**
+ * @} 
+ */
 
 // Settings in the registers are expressed as 16bit values
 //------------------DEVICE_CONFIG------------------------
@@ -32,25 +49,35 @@
 #define MAG_TEMPCO_MASK 0x300
 #define OPERATING_MODE_MASK 0x70
 
-#define CONV_AVG_1x 0x0000
-#define CONV_AVG_2x 0x1000
-#define CONV_AVG_4x 0x2000
-#define CONV_AVG_8x 0x3000
-#define CONV_AVG_16x 0x4000
-#define CONV_AVG_32x 0x5000
+/** @defgroup CONV_AVG Number of averages per conversion
+ * @{
+ */
+#define CONV_AVG_1x 0x0000      ///< @brief No averaging, single conversion
+#define CONV_AVG_2x 0x1000      ///< @brief Average 2 conversions
+#define CONV_AVG_4x 0x2000      ///< @brief Average 4 conversions
+#define CONV_AVG_8x 0x3000      ///< @brief Average 8 conversions
+#define CONV_AVG_16x 0x4000     ///< @brief Average 16 conversions
+#define CONV_AVG_32x 0x5000     ///< @brief Average 32 conversions
+/** @} */
 
 #define MAG_TEMPCO_0pd 0x000
 #define MAG_TEMPCO_012pd 0x100
 #define MAG_TEMPCO_003pd 0x200
 #define MAG_TEMPCO_02pd 0x300
 
-#define OPERATING_MODE_ConfigurationMode 0x00
-#define OPERATING_MODE_StandbyMode 0x10
-#define OPERATING_MODE_ActiveMeasureMode 0x20
-#define OPERATING_MODE_ActiveTriggerMode 0x30
-#define OPERATING_MODE_WakeupAndSleepMode 0x40
-#define OPERATING_MODE_SleepMode 0x50
-#define OPERATING_MODE_DeepsleepMode 0x60
+/** @defgroup OPERATING_MODE Operating mode of TMAG5170
+ * @{
+ */
+#define OPERATING_MODE_ConfigurationMode 0x00   ///< @brief Configuration mode
+#define OPERATING_MODE_StandbyMode 0x10         ///< @brief Standby mode
+#define OPERATING_MODE_ActiveMeasureMode 0x20   ///< @brief Active measure mode
+#define OPERATING_MODE_ActiveTriggerMode 0x30   ///< @brief Active trigger mode
+#define OPERATING_MODE_WakeupAndSleepMode 0x40  ///< @brief Wakeup and sleep mode
+#define OPERATING_MODE_SleepMode 0x50           ///< @brief Sleep mode
+#define OPERATING_MODE_DeepsleepMode 0x60       ///< @brief Deep sleep mode
+/**
+ * @} 
+ */
 
 #define T_CH_EN_TempChannelDisabled 0x0
 #define T_CH_EN_TempChannelEnabled 0x8
@@ -69,21 +96,30 @@
 #define Y_RANGE_MASK 0x000C
 #define X_RANGE_MASK 0x0003
 
-#define ANGLE_EN_NoAngleCalculation 0x0
-#define ANGLE_EN_X_Y 0x4000
-#define ANGLE_EN_Y_Z 0x8000
-#define ANGLE_EN_Z_X 0xC000
+/** @defgroup ANGLE_AXES Angle calculation axes configuration
+ * @{
+ */
+#define ANGLE_EN_NoAngleCalculation 0x0         ///< @brief Angle calculation disabled
+#define ANGLE_EN_X_Y 0x4000                     ///< @brief Angle calculation using X and Y axes
+#define ANGLE_EN_Y_Z 0x8000                     ///< @brief Angle calculation using Y and Z axes
+#define ANGLE_EN_Z_X 0xC000                     ///< @brief Angle calculation using Z and X axes
+/** @} */
 
-#define SLEEPTIME_1ms 0x0
-#define SLEEPTIME_5ms 0x400
-#define SLEEPTIME_10ms 0x800
-#define SLEEPTIME_15ms 0xC00
-#define SLEEPTIME_20ms 0x1000
-#define SLEEPTIME_30ms 0x1400
-#define SLEEPTIME_50ms 0x1800
-#define SLEEPTIME_100ms 0x1C00
-#define SLEEPTIME_500ms 0x2000
-#define SLEEPTIME_1000ms 0x2400
+/** @defgroup SLEEPTIME Sleeptime
+ * Time spent in sleep between conversions in active measure mode.
+ * @{
+ */
+#define SLEEPTIME_1ms 0x0           ///< @brief Sleep time 1ms
+#define SLEEPTIME_5ms 0x400         ///< @brief Sleep time 5ms
+#define SLEEPTIME_10ms 0x800        ///< @brief Sleep time 10ms
+#define SLEEPTIME_15ms 0xC00        ///< @brief Sleep time 15ms
+#define SLEEPTIME_20ms 0x1000       ///< @brief Sleep time 20ms
+#define SLEEPTIME_30ms 0x1400       ///< @brief Sleep time 30ms
+#define SLEEPTIME_50ms 0x1800       ///< @brief Sleep time 50ms
+#define SLEEPTIME_100ms 0x1C00      ///< @brief Sleep time 100ms
+#define SLEEPTIME_500ms 0x2000      ///< @brief Sleep time 500ms
+#define SLEEPTIME_1000ms 0x2400     ///< @brief Sleep time 1000ms
+/** @} */
 
 #define MAG_CH_EN_OFF 0x0
 #define MAG_CH_EN_Xenabled 0x40
@@ -102,30 +138,33 @@
 #define MAG_CH_EN_XYZYXenabled 0x380
 #define MAG_CH_EN_XYZZYXenabled 0x3C0
 
-//------------------A1 variant---------------------------
-#define Z_RANGE_50mT 0x0
-#define Z_RANGE_25mT 0x10
-#define Z_RANGE_100mT 0x20
+/** @defgroup MAG_RANGE Magnetic field range for conversion 
+ * @{
+*/
+#define Z_RANGE_50mT 0x0       ///< @brief Z-axis magnetic range: ±50 mT (A1 variant)
+#define Z_RANGE_25mT 0x10      ///< @brief Z-axis magnetic range: ±25 mT (A1 variant)
+#define Z_RANGE_100mT 0x20     ///< @brief Z-axis magnetic range: ±100 mT (A1 variant)
 
-#define Y_RANGE_50mT 0x0
-#define Y_RANGE_25mT 0x4
-#define Y_RANGE_100mT 0x8
+#define Y_RANGE_50mT 0x0       ///< @brief Y-axis magnetic range: ±50 mT (A1 variant)
+#define Y_RANGE_25mT 0x4       ///< @brief Y-axis magnetic range: ±25 mT (A1 variant)
+#define Y_RANGE_100mT 0x8      ///< @brief Y-axis magnetic range: ±100 mT (A1 variant)
 
-#define X_RANGE_50mT 0x0
-#define X_RANGE_25mT 0x1
-#define X_RANGE_100mT 0x2
+#define X_RANGE_50mT 0x0       ///< @brief X-axis magnetic range: ±50 mT (A1 variant)
+#define X_RANGE_25mT 0x1       ///< @brief X-axis magnetic range: ±25 mT (A1 variant)
+#define X_RANGE_100mT 0x2      ///< @brief X-axis magnetic range: ±100 mT (A1 variant)
 //------------------A2 variant---------------------------
-#define Z_RANGE_150mT 0x0
-#define Z_RANGE_75mT 0x10
-#define Z_RANGE_300mT 0x20
+#define Z_RANGE_150mT 0x0      ///< @brief Z-axis magnetic range: ±150 mT (A2 variant)
+#define Z_RANGE_75mT 0x10      ///< @brief Z-axis magnetic range: ±75 mT (A2 variant)
+#define Z_RANGE_300mT 0x20     ///< @brief Z-axis magnetic range: ±300 mT (A2 variant)
 
-#define Y_RANGE_150mT 0x0
-#define Y_RANGE_75mT 0x4
-#define Y_RANGE_300mT 0x8
+#define Y_RANGE_150mT 0x0      ///< @brief Y-axis magnetic range: ±150 mT (A2 variant)
+#define Y_RANGE_75mT 0x4       ///< @brief Y-axis magnetic range: ±75 mT (A2 variant)
+#define Y_RANGE_300mT 0x8      ///< @brief Y-axis magnetic range: ±300 mT (A2 variant)
 
-#define X_RANGE_150mT 0x0
-#define X_RANGE_75mT 0x1
-#define X_RANGE_300mT 0x2
+#define X_RANGE_150mT 0x0      ///< @brief X-axis magnetic range: ±150 mT (A2 variant)
+#define X_RANGE_75mT 0x1       ///< @brief X-axis magnetic range: ±75 mT (A2 variant)
+#define X_RANGE_300mT 0x2      ///< @brief X-axis magnetic range: ±300 mT (A2 variant)
+/** @} */
 
 //------------------SYSTEM_CONFIG------------------------
 #define DIAG_SEL_MASK 0x3000
@@ -282,10 +321,18 @@
 #include "hardware/spi.h"
 #include "pico/stdlib.h"
 
+/**
+ * @brief Enumeration for TMAG5170 version: A1 or A2.
+ * 
+ */
 enum TMAG5170_version {
     A1 = 0x0, A2 = 0x1, ERROR = 0x3
 };
 
+/**
+ * @brief Class for TMAG5170.
+ * 
+ */
 class TMAG5170 {
     private:
         typedef union {
